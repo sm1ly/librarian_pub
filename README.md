@@ -20,16 +20,17 @@ L2  Full Articles      Obsidian Vault      Markdown files with YAML frontmatter
 
 ```
 raw data → _inbox/ → Chunker (>50KB) → file_parse (Zero-Value filter + synthesis)
-    → /kb search for duplicates → Merge / Create / Drop
+    → Template Selection (documentation) → /kb search for duplicates → Merge / Create / Drop
     → /git_commit → /kbupd (sync L1 index)
 ```
 
-1. **Inbox**: Drop raw files (memory dumps, logs, notes) into `_inbox/`
+1. **Inbox**: Drop raw files (memory dumps, logs, notes, requirement docs) into `_inbox/`
 2. **Chunker** (Haiku subagent): Splits files >50KB into semantic chunks, quarantines toxic content
 3. **file_parse**: Evaluates content value (Zero-Value Protocol — drops garbage), extracts engineering essence, generates YAML frontmatter
-4. **Dedup**: Searches existing KB via `/kb` skill (ClickHouse Bloom filters)
-5. **Merge Logic**: Semantic merge into existing article, or create new one. Lossless fact retention — never drop details for readability
-6. **Persist**: Git commit + ClickHouse L1 index sync
+4. **Template Selection**: If content is project/product documentation (requirements, specs, architecture, market analysis, quality standards), applies modular template structure: `templates/base.md` + relevant addons from `templates/addons/`. Multiple addons combine for complex docs (e.g., PRD + FRD + TRD). Empty fields → `[TBD]`, never fabricated.
+5. **Dedup**: Searches existing KB via `/kb` skill (ClickHouse Bloom filters)
+6. **Merge Logic**: Semantic merge into existing article, or create new one. Lossless fact retention — never drop details for readability
+7. **Persist**: Git commit + ClickHouse L1 index sync
 
 ## Agent Definitions
 
@@ -116,6 +117,10 @@ These files contain paths specific to the reference setup. Update them to match 
 | `skills/kbupd/SKILL.md` | Path to `sync_l1_index.py` script |
 | `skills/kb/SKILL.md` | ClickHouse connection details, `kbcli` path |
 | `skills/librarian/SKILL.md` | Team name (if you want a different one) |
+
+## Credits
+
+Document templates adapted from [req-docs](https://github.com/alenazaharovaux/share) by [@alenazaharovaux](https://github.com/alenazaharovaux) — a collection of requirement document templates for AI coding agents. Licensed under MIT.
 
 ## License
 
